@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduQuery — College Enquiry Chatbot</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f1a;
+    --bg2: #13162b;
+    --bg3: #1a1e35;
+    --card: #1e2340;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #f0f2ff;
+    --text2: #9aa0c4;
+    --text3: #5c6390;
+    --accent: #6c63ff;
+    --accent2: #8b84ff;
+    --gold: #f7c948;
+    --teal: #3ecfcf;
+    --pink: #ff6b9d;
+    --green: #4ade80;
+    --radius: 14px;
+    --radius2: 20px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ───── UTILITY ───── */
+  .hidden { display: none !important; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+  /* ───── SCROLLBAR ───── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+  /* ───── NAV ───── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 68px;
+    background: rgba(13,15,26,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700;
+    color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent2); }
+  .logo-dot {
+    width: 10px; height: 10px;
+    background: var(--accent); border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+  .nav-links { display: flex; gap: 0.5rem; align-items: center; }
+  .nav-btn {
+    padding: 8px 18px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; border: none;
+    text-decoration: none;
+  }
+  .nav-btn.ghost {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border2);
+  }
+  .nav-btn.ghost:hover { background: var(--bg3); color: var(--text); }
+  .nav-btn.primary {
+    background: var(--accent); color: #fff;
+  }
+  .nav-btn.primary:hover { background: var(--accent2); transform: translateY(-1px); }
+
+  /* ───── PAGES ───── */
+  .page { display: none; min-height: 100vh; padding-top: 68px; }
+  .page.active { display: block; }
+
+  /* ───── HERO ───── */
+  #home {
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(108,99,255,0.25) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(62,207,207,0.1) 0%, transparent 50%),
+                var(--bg);
+  }
+  .hero {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: calc(100vh - 68px);
+    text-align: center; padding: 4rem 2rem;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 100px;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.4);
+    font-size: 0.8rem; font-weight: 500; color: var(--accent2);
+    margin-bottom: 2rem;
+    animation: fadeDown 0.6s ease both;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 700;
+    line-height: 1.1; margin-bottom: 1.5rem;
+    animation: fadeDown 0.7s 0.1s ease both;
+  }
+  .hero h1 em { color: var(--accent2); font-style: normal; }
+  .hero p {
+    font-size: 1.15rem; color: var(--text2); max-width: 560px;
+    line-height: 1.7; margin-bottom: 2.5rem;
+    animation: fadeDown 0.7s 0.2s ease both;
+  }
+  .hero-btns {
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    animation: fadeDown 0.7s 0.3s ease both;
+  }
+  .btn-large {
+    padding: 14px 32px; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; border: none; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-large.primary { background: var(--accent); color: #fff; }
+  .btn-large.primary:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(108,99,255,0.4); }
+  .btn-large.outline {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .btn-large.outline:hover { background: var(--bg3); transform: translateY(-2px); }
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ───── SECTIONS GRID ───── */
+  .sections-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem; padding: 4rem 2rem;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .section-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius2); padding: 2rem;
+    cursor: pointer; transition: all 0.3s;
+    position: relative; overflow: hidden;
+    text-align: center;
+  }
+  .section-card::before {
+    content: ''; position: absolute; inset: 0;
+    opacity: 0; transition: opacity 0.3s;
+    border-radius: inherit;
+  }
+  .section-card:hover { transform: translateY(-6px); border-color: var(--border2); }
+  .section-card:hover::before { opacity: 1; }
+  .sc-student::before { background: radial-gradient(ellipse at top, rgba(108,99,255,0.15), transparent 70%); }
+  .sc-faculty::before { background: radial-gradient(ellipse at top, rgba(247,201,72,0.12), transparent 70%); }
+  .sc-parent::before { background: radial-gradient(ellipse at top, rgba(62,207,207,0.12), transparent 70%); }
+  .sc-visitor::before { background: radial-gradient(ellipse at top, rgba(255,107,157,0.12), transparent 70%); }
+  .sc-icon {
+    width: 64px; height: 64px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; margin: 0 auto 1.2rem;
+  }
+  .sc-student .sc-icon { background: rgba(108,99,255,0.15); }
+  .sc-faculty .sc-icon { background: rgba(247,201,72,0.12); }
+  .sc-parent .sc-icon { background: rgba(62,207,207,0.12); }
+  .sc-visitor .sc-icon { background: rgba(255,107,157,0.12); }
+  .section-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;
+  }
+  .section-card p { font-size: 0.9rem; color: var(--text2); line-height: 1.6; }
+  .sc-arrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 1.2rem; font-size: 0.85rem; font-weight: 500;
+    color: var(--text3); transition: color 0.2s, gap 0.2s;
+  }
+  .section-card:hover .sc-arrow { color: var(--text2); gap: 10px; }
+
+  /* ───── CHAT PAGE ───── */
+  #chat-page {
+    display: none; min-height: 100vh; padding-top: 68px;
+    flex-direction: column;
+  }
+  #chat-page.active { display: flex; }
+  .chat-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 1rem;
+    background: var(--bg2);
+  }
+  .chat-section-badge {
+    padding: 6px 14px; border-radius: 100px;
+    font-size: 0.8rem; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .badge-student { background: rgba(108,99,255,0.2); color: var(--accent2); }
+  .badge-faculty { background: rgba(247,201,72,0.15); color: var(--gold); }
+  .badge-parent { background: rgba(62,207,207,0.15); color: var(--teal); }
+  .badge-visitor { background: rgba(255,107,157,0.15); color: var(--pink); }
+  .chat-back {
+    background: none; border: none; color: var(--text2);
+    font-size: 1.2rem; cursor: pointer; padding: 4px 8px;
+    border-radius: 8px; transition: background 0.2s;
+  }
+  .chat-back:hover { background: var(--bg3); }
+  .chat-body {
+    flex: 1; overflow-y: auto; padding: 2rem;
+    max-width: 860px; width: 100%; margin: 0 auto;
+    display: flex; flex-direction: column; gap: 1.2rem;
+  }
+  .msg {
+    display: flex; gap: 12px; align-items: flex-end; max-width: 75%;
+    animation: msgIn 0.25s ease both;
+  }
+  @keyframes msgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-avatar {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; flex-shrink: 0;
+    background: var(--accent); color: #fff;
+  }
+  .msg.user .msg-avatar { background: var(--bg3); }
+  .msg-bubble {
+    padding: 12px 16px; border-radius: 14px;
+    font-size: 0.95rem; line-height: 1.65;
+  }
+  .msg.bot .msg-bubble {
+    background: var(--card); color: var(--text);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user .msg-bubble {
+    background: var(--accent); color: #fff;
+    border-bottom-right-radius: 4px;
+  }
+  .msg-time { font-size: 0.72rem; color: var(--text3); margin-top: 4px; }
+  .chat-footer {
+    padding: 1.2rem 2rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  .chat-input-row {
+    max-width: 860px; margin: 0 auto;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .chat-input-wrap { flex: 1; position: relative; }
+  .chat-input {
+    width: 100%; background: var(--bg3);
+    border: 1px solid var(--border2); border-radius: 12px;
+    padding: 12px 16px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    outline: none; resize: none;
+    transition: border-color 0.2s;
+    min-height: 48px; max-height: 120px;
+  }
+  .chat-input:focus { border-color: var(--accent); }
+  .chat-input::placeholder { color: var(--text3); }
+  .chat-send {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--accent); border: none;
+    color: #fff; cursor: pointer; font-size: 1.2rem;
+    transition: all 0.2s; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chat-send:hover { background: var(--accent2); transform: scale(1.05); }
+  .chat-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .quick-chips {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    max-width: 860px; margin: 0 auto 0.8rem;
+  }
+  .chip {
+    padding: 6px 14px; border-radius: 100px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    color: var(--text2); font-size: 0.82rem; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chip:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .typing-dot { display: inline-flex; gap: 4px; padding: 4px 0; }
+  .typing-dot span {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text3); display: block;
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dot span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+  /* ───── AUTH PAGES ───── */
+  .auth-page {
+    display: none; min-height: 100vh; padding-top: 68px;
+    align-items: center; justify-content: center;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(108,99,255,0.2) 0%, transparent 60%),
+                var(--bg);
+  }
+  .auth-page.active { display: flex; }
+  .auth-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius2); padding: 3rem;
+    width: 100%; max-width: 440px; margin: 2rem;
+  }
+  .auth-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; margin-bottom: 0.4rem;
+  }
+  .auth-card .auth-sub { color: var(--text2); font-size: 0.9rem; margin-bottom: 2rem; }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-group label {
+    display: block; font-size: 0.85rem; font-weight: 500;
+    color: var(--text2); margin-bottom: 6px;
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; background: var(--bg3);
+    border: 1px solid var(--border2); border-radius: 10px;
+    padding: 12px 14px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--accent);
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: var(--text3); }
+  .form-group select { appearance: none; cursor: pointer; }
+  .form-group select option { background: var(--bg2); }
+  .auth-submit {
+    width: 100%; padding: 13px; border-radius: 10px;
+    background: var(--accent); border: none; color: #fff;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; margin-top: 0.5rem;
+  }
+  .auth-submit:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(108,99,255,0.4); }
+  .auth-alt { text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text2); }
+  .auth-link { color: var(--accent2); cursor: pointer; text-decoration: none; font-weight: 500; }
+  .auth-link:hover { color: var(--text); }
+  .divider {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 1.5rem 0; color: var(--text3); font-size: 0.82rem;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .form-error {
+    background: rgba(227,74,74,0.15); border: 1px solid rgba(227,74,74,0.3);
+    border-radius: 8px; padding: 10px 14px;
+    color: #ff8080; font-size: 0.87rem; margin-bottom: 1rem;
+    display: none;
+  }
+  .form-success {
+    background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3);
+    border-radius: 8px; padding: 10px 14px;
+    color: var(--green); font-size: 0.87rem; margin-bottom: 1rem;
+    display: none;
+  }
+  .eye-btn {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--text3); cursor: pointer;
+    font-size: 1rem;
+  }
+  .input-wrap { position: relative; }
+
+  /* ───── SUGGESTION BOX ───── */
+  #suggestion-page {
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(62,207,207,0.15), transparent 50%), var(--bg);
+  }
+  .suggestion-wrap {
+    max-width: 640px; margin: 0 auto; padding: 4rem 2rem;
+  }
+  .suggestion-wrap h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; margin-bottom: 0.5rem;
+  }
+  .suggestion-wrap .sub { color: var(--text2); margin-bottom: 3rem; }
+  .suggestion-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius2); padding: 2rem;
+  }
+  .suggestion-card textarea {
+    width: 100%; min-height: 140px; resize: vertical;
+  }
+  .char-count { text-align: right; font-size: 0.8rem; color: var(--text3); margin-top: 4px; }
+  .rating-group { display: flex; gap: 10px; margin-top: 8px; }
+  .rating-btn {
+    flex: 1; padding: 10px; border-radius: 8px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    color: var(--text2); cursor: pointer; font-size: 0.85rem; font-weight: 500;
+    transition: all 0.2s; text-align: center;
+  }
+  .rating-btn.active, .rating-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* ───── TOAST ───── */
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+    padding: 14px 20px; border-radius: 12px;
+    background: var(--card); border: 1px solid var(--border2);
+    color: var(--text); font-size: 0.9rem;
+    display: flex; align-items: center; gap: 10px;
+    transform: translateY(20px); opacity: 0;
+    transition: all 0.3s; pointer-events: none;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-icon { font-size: 1.1rem; }
+
+  /* ───── FOOTER ───── */
+  footer {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    padding: 3rem 2rem; text-align: center;
+    color: var(--text3); font-size: 0.85rem;
+  }
+  footer .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; color: var(--text); margin-bottom: 0.5rem;
+  }
+
+  /* ───── STATS ───── */
+  .stats-strip {
+    display: flex; justify-content: center; gap: 3rem;
+    flex-wrap: wrap; padding: 2rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: rgba(108,99,255,0.04);
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 700;
+    color: var(--accent2);
+  }
+  .stat-label { font-size: 0.82rem; color: var(--text3); margin-top: 2px; }
+
+  /* ───── FEATURES ───── */
+  .features-section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-label {
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 2px;
+    color: var(--accent2); text-transform: uppercase; margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem; margin-bottom: 1rem;
+  }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.2rem; margin-top: 3rem;
+  }
+  .feat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .feat-card:hover { border-color: var(--border2); }
+  .feat-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; margin-bottom: 1rem;
+    background: rgba(108,99,255,0.12);
+  }
+  .feat-card h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .feat-card p { font-size: 0.85rem; color: var(--text2); line-height: 1.6; }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    nav { padding: 0 1rem; }
+    .hero { padding: 2rem 1rem; }
+    .auth-card { padding: 2rem 1.5rem; }
+    .chat-body { padding: 1rem; }
+    .chat-footer { padding: 1rem; }
+    .chat-header { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ───── NAV ───── -->
+<nav>
+  <a class="nav-logo" onclick="showPage('home')" style="cursor:pointer">
+    <span class="logo-dot"></span>
+    Edu<span>Query</span>
+  </a>
+  <div class="nav-links" id="nav-auth">
+    <button class="nav-btn ghost" onclick="showPage('login')">Log In</button>
+    <button class="nav-btn primary" onclick="showPage('register')">Sign Up</button>
+  </div>
+  <div class="nav-links hidden" id="nav-user">
+    <button class="nav-btn ghost" onclick="showPage('suggestion-page')">💡 Suggest</button>
+    <span id="nav-username" style="color:var(--text2);font-size:.9rem;padding:0 8px"></span>
+    <button class="nav-btn ghost" onclick="logout()">Log Out</button>
+  </div>
+</nav>
+
+<!-- ───── HOME ───── -->
+<div id="home" class="page active">
+  <section class="hero">
+    <div class="hero-badge">✦ AI-Powered College Assistant</div>
+    <h1>Your College Questions,<br><em>Answered Instantly</em></h1>
+    <p>Ask anything about admissions, faculty, courses, fees, or campus life. EduQuery's intelligent chatbot is here 24/7 for students, faculty, parents, and visitors.</p>
+    <div class="hero-btns">
+      <button class="btn-large primary" onclick="requireAuth()">Start Chatting →</button>
+      <button class="btn-large outline" onclick="scrollToSections()">Explore Sections</button>
+    </div>
+  </section>
+
+  <div class="stats-strip">
+    <div class="stat"><div class="stat-num">12k+</div><div class="stat-label">Questions Answered</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Enquiry Sections</div></div>
+    <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Available</div></div>
+    <div class="stat"><div class="stat-num">98%</div><div class="stat-label">Satisfaction Rate</div></div>
+  </div>
+
+  <div id="sections-anchor" class="sections-grid">
+    <div class="section-card sc-student" onclick="openChat('student')">
+      <div class="sc-icon">🎓</div>
+      <h3>Student Enquiry</h3>
+      <p>Ask about admissions, courses, exam schedules, results, scholarships, and campus life.</p>
+      <div class="sc-arrow">Chat Now →</div>
+    </div>
+    <div class="section-card sc-faculty" onclick="openChat('faculty')">
+      <div class="sc-icon">👨‍🏫</div>
+      <h3>Faculty Enquiry</h3>
+      <p>Get information on department policies, research, academic calendar, and staff portals.</p>
+      <div class="sc-arrow">Chat Now →</div>
+    </div>
+    <div class="section-card sc-parent" onclick="openChat('parent')">
+      <div class="sc-icon">👨‍👩‍👧</div>
+      <h3>Parent Enquiry</h3>
+      <p>Learn about fees, hostel facilities, attendance policies, and stay updated on your ward.</p>
+      <div class="sc-arrow">Chat Now →</div>
+    </div>
+    <div class="section-card sc-visitor" onclick="openChat('visitor')">
+      <div class="sc-icon">🏛️</div>
+      <h3>Visitor Enquiry</h3>
+      <p>Explore campus tours, events, visiting hours, and general college information.</p>
+      <div class="sc-arrow">Chat Now →</div>
+    </div>
+  </div>
+
+  <section class="features-section">
+    <div class="section-label">Why EduQuery</div>
+    <h2 class="section-title">Everything you need to know,<br>in one place</h2>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h4>Instant Responses</h4>
+        <p>No waiting in queues. Get accurate answers to your college queries within seconds.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🧠</div>
+        <h4>AI-Powered Intelligence</h4>
+        <p>Powered by advanced language models trained on college-specific knowledge bases.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔒</div>
+        <h4>Secure & Private</h4>
+        <p>Your conversations are confidential. Role-based access ensures data security.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📱</div>
+        <h4>Works Everywhere</h4>
+        <p>Fully responsive on mobile, tablet, and desktop. Access anytime, anywhere.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">EduQuery</div>
+    <p>The intelligent college enquiry assistant</p>
+    <p style="margin-top:1rem">© 2025 EduQuery. Built with ❤️ for students, faculty, parents & visitors.</p>
+  </footer>
+</div>
+
+<!-- ───── CHAT PAGE ───── -->
+<div id="chat-page" class="page">
+  <div class="chat-header">
+    <button class="chat-back" onclick="showPage('home')">←</button>
+    <span id="chat-section-badge" class="chat-section-badge badge-student">🎓 Student Enquiry</span>
+    <span style="color:var(--text3);font-size:.85rem;margin-left:auto">AI is ready</span>
+    <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-left:6px;box-shadow:0 0 6px var(--green)"></span>
+  </div>
+  <div class="chat-body" id="chat-body"></div>
+  <div class="chat-footer">
+    <div class="quick-chips" id="quick-chips"></div>
+    <div class="chat-input-row">
+      <div class="chat-input-wrap">
+        <textarea class="chat-input" id="chat-input" placeholder="Type your question here..." rows="1" onkeydown="chatKeydown(event)" oninput="autoResize(this)"></textarea>
+      </div>
+      <button class="chat-send" id="chat-send" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───── LOGIN ───── -->
+<div id="login" class="auth-page">
+  <div class="auth-card">
+    <h2>Welcome back 👋</h2>
+    <p class="auth-sub">Sign in to your EduQuery account</p>
+    <div class="form-error" id="login-error"></div>
+    <div class="form-success" id="login-success"></div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="you@college.edu">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <input type="password" id="login-password" placeholder="Enter your password">
+        <button class="eye-btn" onclick="togglePwd('login-password')">👁</button>
+      </div>
+    </div>
+    <div style="text-align:right;margin:-8px 0 16px">
+      <a class="auth-link" onclick="showPage('forgot')">Forgot password?</a>
+    </div>
+    <button class="auth-submit" onclick="doLogin()">Sign In</button>
+    <div class="auth-alt">
+      Don't have an account? <a class="auth-link" onclick="showPage('register')">Create one</a>
+    </div>
+  </div>
+</div>
+
+<!-- ───── REGISTER ───── -->
+<div id="register" class="auth-page">
+  <div class="auth-card">
+    <h2>Create account ✦</h2>
+    <p class="auth-sub">Join EduQuery and get instant answers</p>
+    <div class="form-error" id="reg-error"></div>
+    <div class="form-success" id="reg-success"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label>First Name</label>
+        <input type="text" id="reg-fname" placeholder="John">
+      </div>
+      <div class="form-group">
+        <label>Last Name</label>
+        <input type="text" id="reg-lname" placeholder="Doe">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="reg-email" placeholder="you@college.edu">
+    </div>
+    <div class="form-group">
+      <label>Role</label>
+      <select id="reg-role">
+        <option value="">Select your role...</option>
+        <option value="student">Student</option>
+        <option value="faculty">Faculty</option>
+        <option value="parent">Parent</option>
+        <option value="visitor">Visitor</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <input type="password" id="reg-password" placeholder="Min. 8 characters">
+        <button class="eye-btn" onclick="togglePwd('reg-password')">👁</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input type="password" id="reg-confirm" placeholder="Repeat your password">
+    </div>
+    <button class="auth-submit" onclick="doRegister()">Create Account</button>
+    <div class="auth-alt">
+      Already have an account? <a class="auth-link" onclick="showPage('login')">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<!-- ───── FORGOT PASSWORD ───── -->
+<div id="forgot" class="auth-page">
+  <div class="auth-card">
+    <h2>Reset password 🔑</h2>
+    <p class="auth-sub">We'll send you instructions to reset your password</p>
+    <div class="form-error" id="forgot-error"></div>
+    <div class="form-success" id="forgot-success"></div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="forgot-email" placeholder="you@college.edu">
+    </div>
+    <button class="auth-submit" onclick="doForgot()">Send Reset Link</button>
+    <div class="auth-alt">
+      Remembered it? <a class="auth-link" onclick="showPage('login')">Back to login</a>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SUGGESTION BOX ───── -->
+<div id="suggestion-page" class="page">
+  <div class="suggestion-wrap">
+    <div class="section-label">Feedback</div>
+    <h2>Suggestion Box 💡</h2>
+    <p class="sub">Your feedback helps us improve EduQuery for everyone.</p>
+    <div class="suggestion-card">
+      <div class="form-error" id="sug-error"></div>
+      <div class="form-success" id="sug-success"></div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="sug-category">
+          <option value="">Select category...</option>
+          <option>Chatbot Accuracy</option>
+          <option>UI/UX Design</option>
+          <option>Missing Information</option>
+          <option>Feature Request</option>
+          <option>Bug Report</option>
+          <option>General Feedback</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Your Suggestion</label>
+        <textarea id="sug-text" placeholder="Share your thoughts, ideas, or report issues..." maxlength="500" oninput="updateChar(this)"></textarea>
+        <div class="char-count"><span id="char-out">0</span>/500</div>
+      </div>
+      <div class="form-group">
+        <label>Overall Experience</label>
+        <div class="rating-group" id="rating-group">
+          <button class="rating-btn" onclick="setRating(1)">😞 Poor</button>
+          <button class="rating-btn" onclick="setRating(2)">😐 Okay</button>
+          <button class="rating-btn" onclick="setRating(3)">😊 Good</button>
+          <button class="rating-btn" onclick="setRating(4)">🤩 Great</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Name (optional)</label>
+        <input type="text" id="sug-name" placeholder="Anonymous">
+      </div>
+      <button class="auth-submit" onclick="submitSuggestion()">Submit Suggestion</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───── TOAST ───── -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✅</span>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let currentUser = JSON.parse(localStorage.getItem('eq_user') || 'null');
+let currentSection = 'student';
+let selectedRating = 0;
+let isTyping = false;
+
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page, .auth-page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
+  updateNav();
+}
+
+function updateNav() {
+  if (currentUser) {
+    document.getElementById('nav-auth').classList.add('hidden');
+    document.getElementById('nav-user').classList.remove('hidden');
+    document.getElementById('nav-username').textContent = currentUser.fname;
+  } else {
+    document.getElementById('nav-auth').classList.remove('hidden');
+    document.getElementById('nav-user').classList.add('hidden');
+  }
+}
+
+function scrollToSections() {
+  document.getElementById('sections-anchor').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════════
+//  AUTH GUARD
+// ═══════════════════════════════════════════════════
+function requireAuth(role = 'visitor') {
+  if (currentUser) {
+    openChat(currentUser.role || 'student');
+  } else {
+    openChat(role); // 👈 allow visitor directly
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  REGISTER
+// ═══════════════════════════════════════════════════
+async function doRegister() {
+  const fname = v('reg-fname');
+  const lname = v('reg-lname');
+  const email = v('reg-email');
+  const role = v('reg-role');
+  const pwd = v('reg-password');
+  const cpwd = v('reg-confirm');
+
+  hideMsg('reg-error'); hideMsg('reg-success');
+
+  if (!fname || !lname || !email || !role || !pwd || !cpwd)
+    return showMsg('reg-error', '⚠ Please fill in all fields.');
+  if (!email.includes('@'))
+    return showMsg('reg-error', '⚠ Please enter a valid email.');
+  if (pwd.length < 8)
+    return showMsg('reg-error', '⚠ Password must be at least 8 characters.');
+  if (pwd !== cpwd)
+    return showMsg('reg-error', '⚠ Passwords do not match.');
+
+  const res = await fetch("http://localhost:5000/register", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      fname, lname, email, role, password: pwd
+    })
+  });
+
+  const result = await res.json();
+
+  if (result.error) return showMsg('reg-error', result.error);
+
+  showMsg('reg-success', '✅ Account created!');
+  setTimeout(() => showPage('login'), 1000);
+}
+
+// ═══════════════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════════════
+async function doLogin() {
+  const email = v('login-email');
+  const pwd = v('login-password');
+
+  hideMsg('login-error'); hideMsg('login-success');
+
+  if (!email || !pwd)
+    return showMsg('login-error', '⚠ Please fill in all fields.');
+
+  const res = await fetch("http://localhost:5000/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      email,
+      password: pwd
+    })
+  });
+
+  const result = await res.json();
+
+  if (result.error)
+    return showMsg('login-error', result.error);
+
+  currentUser = result.user;
+  localStorage.setItem('eq_user', JSON.stringify(result.user));
+
+  showMsg('login-success', `✅ Welcome ${result.user.fname}!`);
+
+  setTimeout(() => {
+    showPage('home');
+    openChat(result.user.role || 'student');
+  }, 1000);
+}
+
+// ═══════════════════════════════════════════════════
+//  LOGOUT
+// ═══════════════════════════════════════════════════
+function logout() {
+  currentUser = null;
+  localStorage.removeItem('eq_user');
+  updateNav();
+  showPage('home');
+  showToast('👋 Logged out successfully');
+}
+
+// ═══════════════════════════════════════════════════
+//  CHAT
+// ═══════════════════════════════════════════════════
+const sectionConfig = {
+  student: {
+    label: '🎓 Student Enquiry', badgeClass: 'badge-student',
+    color: 'var(--accent2)',
+    chips: ['Admission process', 'Fee structure', 'Exam schedule', 'Scholarship info', 'Result inquiry'],
+    welcome: "Hello! I'm your Student Enquiry Assistant 🎓\n\nI can help you with admissions, courses, fees, exam schedules, scholarships, results, and much more. What would you like to know?",
+    responses: {
+      'admission': "**Admission Process:**\n\nOur college offers admissions through:\n• **Online Application** via the official portal\n• **Merit-based** selection for UG programs\n• **Entrance Exam** for PG and MBA programs\n\nKey dates:\n• Application Opens: June 1st\n• Last Date: July 15th\n• Results: August 1st\n\nDocuments needed: 10th & 12th marksheets, ID proof, passport photo.",
+      'fee': "**Fee Structure (2024-25):**\n\n| Program | Annual Fee |\n|---------|------------|\n| B.Tech | ₹85,000 |\n| BCA | ₹55,000 |\n| MBA | ₹1,20,000 |\n| MCA | ₹75,000 |\n\nFee can be paid in **2 installments**. Scholarships available for merit students (up to 50% waiver).",
+      'exam': "**Upcoming Exam Schedule:**\n\n📅 **Internal Exams:** Oct 10–20\n📅 **End Semester:** Nov 25 – Dec 15\n📅 **Supplementary:** January 10–20\n\nHall tickets are available on the student portal 5 days before exams. Bring your ID card to every exam.",
+      'scholarship': "**Scholarship Programs:**\n\n1. **Merit Scholarship** — Top 10% students: 50% fee waiver\n2. **Sports Quota** — State/National level: 30% waiver\n3. **SC/ST Scholarship** — Govt. scheme: Full coverage\n4. **Management Scholarship** — Based on interview: 20–40%\n\nApply via the scholarship portal by August 31st.",
+      'result': "**Results Portal:**\n\nCheck your results at: **results.college.edu**\nLog in with your enrollment number.\n\nGrade release timeline:\n• Internal marks: Within 1 week of exam\n• End semester: 4–6 weeks after last paper\n\nFor re-evaluation, apply within 15 days of result declaration."
+    }
+  },
+  faculty: {
+    label: '👨‍🏫 Faculty Enquiry', badgeClass: 'badge-faculty',
+    color: 'var(--gold)',
+    chips: ['Academic calendar', 'Research grants', 'Leave policy', 'Staff portal', 'HOD contact'],
+    welcome: "Hello, Professor! Welcome to the Faculty Enquiry Desk 👨‍🏫\n\nI can assist you with department policies, academic calendar, research grants, leave applications, and administrative queries. How can I help?",
+    responses: {
+      'calendar': "**Academic Calendar 2024-25:**\n\n📘 **Odd Semester:** July 15 – November 30\n• Mid-sem break: September 15–20\n• Internal exams: October 1–10\n\n📗 **Even Semester:** January 2 – May 31\n• Spring break: March 10–15\n• Annual fest: February 14–16\n\nFull calendar available on the faculty portal.",
+      'research': "**Research & Grants:**\n\n• **Seed Grant:** Up to ₹2 lakhs for new faculty researchers\n• **DST/SERB Projects:** College provides 30% co-funding\n• **Publications:** Incentives of ₹10,000–₹50,000 per indexed paper\n\nSubmit research proposals to the R&D cell by the 15th of each month. Contact: rd@college.edu",
+      'leave': "**Leave Policy:**\n\n| Leave Type | Days/Year |\n|------------|----------|\n| Casual Leave | 12 days |\n| Sick Leave | 15 days |\n| Earned Leave | 30 days |\n| Maternity/Paternity | As per govt. |\n\nApply via HR portal at least 3 days in advance (except emergency). HoD approval required for >3 days.",
+      'portal': "**Staff Portal Access:**\n\n🔗 **URL:** staff.college.edu\n👤 **Login:** Your employee ID + registered email\n\nFeatures: Payslips, leave applications, timetable, student attendance upload, exam duty roster, research submission.\n\nFor reset: Contact IT helpdesk at it@college.edu or ext. 2001.",
+      'hod': "**HoD Contact Directory:**\n\n| Department | HoD | Email |\n|------------|-----|-------|\n| CS/IT | Dr. Sharma | hod.cs@college.edu |\n| ECE | Dr. Patel | hod.ece@college.edu |\n| MBA | Dr. Rao | hod.mba@college.edu |\n| Science | Dr. Mehta | hod.sci@college.edu |"
+    }
+  },
+  parent: {
+    label: '👨‍👩‍👧 Parent Enquiry', badgeClass: 'badge-parent',
+    color: 'var(--teal)',
+    chips: ['Fee payment', 'Hostel info', 'Attendance update', 'Ward progress', 'Transport'],
+    welcome: "Welcome, Parent! 👨‍👩‍👧\n\nThank you for your interest in your child's education. I'm here to help you with fee payments, hostel details, attendance, academic progress, and more. What would you like to know?",
+    responses: {
+      'fee': "**Fee Payment Options:**\n\n💳 **Online:** Via parent portal (NetBanking, UPI, Cards)\n🏦 **Bank Challan:** SBI & HDFC branches\n📱 **Mobile App:** EduPay app\n\nFee due dates:\n• 1st installment: July 31\n• 2nd installment: December 31\n\nLate fee: ₹100/day after due date. Receipts are auto-emailed.",
+      'hostel': "**Hostel Facilities:**\n\n🏠 **Capacity:** 1200 students (separate boys & girls blocks)\n🛏 **Room Types:** Single (₹80k/yr), Double (₹55k/yr), Triple (₹40k/yr)\n\n**Amenities:** Wi-Fi, laundry, mess (3 meals/day), 24/7 security, CCTV, medical room, indoor games.\n\nWardens available 24/7. Visiting hours: 4–7 PM on weekdays, 10 AM–6 PM on weekends.",
+      'attendance': "**Attendance Monitoring:**\n\nParents receive:\n• 📱 **SMS alerts** when attendance falls below 75%\n• 📧 **Weekly email digest** of attendance\n• 🔔 **Real-time app notifications**\n\nCheck live attendance: parent.college.edu → Login → 'My Ward' tab.\n\nAttendance below 75% leads to exam debarment. Medical certificates are accepted.",
+      'ward': "**Tracking Ward Progress:**\n\n📊 **Parent Portal:** parent.college.edu\n\nFeatures:\n• Live attendance & exam marks\n• Assignment submission status\n• Teacher feedback & remarks\n• Fee payment history\n• Communication with faculty\n\nParent-teacher meeting: Every 2nd Saturday of the month. Prior appointment needed.",
+      'transport': "**College Transport:**\n\n🚌 **Route Coverage:** 25+ routes across the city\n💰 **Annual Fee:** ₹18,000–₹28,000 (based on distance)\n⏰ **Timings:** Morning 7–9 AM, Evening 4–6 PM\n\nRoute details and bus tracker: transport.college.edu\nFor new route request: transport@college.edu"
+    }
+  },
+  visitor: {
+    label: '🏛️ Visitor Enquiry', badgeClass: 'badge-visitor',
+    color: 'var(--pink)',
+    chips: ['Campus tour', 'Visiting hours', 'Events', 'Location & map', 'Contact us'],
+    welcome: "Welcome to EduQuery! 🏛️\n\nI'm the Visitor Assistance Bot. I can help you with campus tours, event schedules, directions, visiting hours, and general information about our institution. How can I assist you today?",
+    responses: {
+      'tour': "**Campus Tour Information:**\n\n🗺️ **Guided Tours:** Mon–Sat, 10 AM and 2 PM\n⏱️ **Duration:** ~1.5 hours\n👤 **Booking:** Call +91-9876543210 or email tours@college.edu\n\nTour includes:\n• Academic blocks & labs\n• Library & sports complex\n• Hostel & canteen\n• Innovation center & auditorium\n\nSelf-guided tour map available at the main gate.",
+      'visiting': "**Visiting Hours:**\n\n📅 **Weekdays:** 9 AM – 5 PM\n📅 **Saturdays:** 10 AM – 3 PM\n🚫 **Sundays & Holidays:** Closed\n\n**Entry requirements:**\n• Valid photo ID mandatory\n• Register at the security gate\n• Visitor pass to be worn at all times\n\nFor special events or institutional visits, prior appointment is required.",
+      'event': "**Upcoming Events:**\n\n🎭 **Annual Cultural Fest** — Feb 14–16\n🔬 **Tech Symposium** — March 5–6\n🎓 **Convocation** — April 20\n🏏 **Inter-college Sports Meet** — March 20–25\n\nAll events are open to visitors unless marked 'students only'. Register at events.college.edu for free entry.",
+      'location': "**Location & Directions:**\n\n📍 **Address:** EduQuery College, Sector 14, Knowledge Park, New Delhi – 110001\n\n🚇 **Metro:** Knowledge Park Station (Yellow Line), 5 min walk\n🚌 **Bus:** Routes 42, 67, 91 stop at college gate\n🚗 **By Road:** NH-48, take Knowledge Park exit\n\n🅿️ **Parking:** Free parking for 300 vehicles near Block-C entrance.",
+      'contact': "**Contact Information:**\n\n📞 **Main Office:** +91-11-2345-6789\n📱 **WhatsApp:** +91-9876543210\n📧 **General:** info@college.edu\n📧 **Admissions:** admissions@college.edu\n\n🕐 **Office Hours:** Mon–Fri, 9 AM – 5 PM\n\nFor urgent queries during events, contact our help desk at the main gate or call the visitor helpline."
+    }
+  }
+};
+
+function openChat(section) {
+  // 👇 Allow visitor without login
+  if (!currentUser && section !== 'visitor') {
+    showPage('login');
+    return;
+  }
+  currentSection = section;
+  const cfg = sectionConfig[section];
+
+  document.getElementById('chat-section-badge').textContent = cfg.label;
+  document.getElementById('chat-section-badge').className = 'chat-section-badge ' + cfg.badgeClass;
+
+  const body = document.getElementById('chat-body');
+  body.innerHTML = '';
+
+  const chips = document.getElementById('quick-chips');
+  chips.innerHTML = cfg.chips.map(c => `<button class="chip" onclick="sendChip('${c}')">${c}</button>`).join('');
+
+  showPage('chat-page');
+  addBotMsg(cfg.welcome.replace(/\n/g, '<br>'));
+}
+
+function addBotMsg(text) {
+  const body = document.getElementById('chat-body');
+  const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  div.innerHTML = `
+    <div class="msg-avatar">🤖</div>
+    <div>
+      <div class="msg-bubble">${formatMsg(text)}</div>
+      <div class="msg-time">${now}</div>
+    </div>`;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function addUserMsg(text) {
+  const body = document.getElementById('chat-body');
+  const now = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  const init = currentUser ? currentUser.fname[0].toUpperCase() : 'U';
+  const div = document.createElement('div');
+  div.className = 'msg user';
+  div.innerHTML = `
+    <div class="msg-avatar">${init}</div>
+    <div>
+      <div class="msg-bubble">${escHtml(text)}</div>
+      <div class="msg-time" style="text-align:right">${now}</div>
+    </div>`;
+  document.getElementById('chat-body').appendChild(div);
+  document.getElementById('chat-body').scrollTop = 999999;
+}
+
+function showTyping() {
+  const body = document.getElementById('chat-body');
+  const div = document.createElement('div');
+  div.className = 'msg bot'; div.id = 'typing-indicator';
+  div.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-bubble"><div class="typing-dot"><span></span><span></span><span></span></div></div>`;
+  body.appendChild(div);
+  body.scrollTop = 999999;
+}
+
+function hideTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function getAIResponse(msg) {
+  const cfg = sectionConfig[currentSection];
+  const lower = msg.toLowerCase();
+  for (const [key, resp] of Object.entries(cfg.responses)) {
+    if (lower.includes(key)) return resp;
+  }
+  // keyword fallbacks
+  if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey'))
+    return `Hello! 👋 I'm your ${cfg.label} assistant. Feel free to ask me anything — try the quick chips below or type your question!`;
+  if (lower.includes('thank'))
+    return "You're welcome! 😊 Is there anything else I can help you with?";
+  if (lower.includes('bye') || lower.includes('goodbye'))
+    return "Goodbye! Have a great day! 👋 Come back anytime you have questions.";
+  if (lower.includes('help'))
+    return `I can assist with:\n${Object.keys(cfg.responses).map(k => `• ${k.charAt(0).toUpperCase()+k.slice(1)}`).join('\n')}\n\nWhat would you like to know?`;
+  return `I understand you're asking about "${msg}". For detailed information on this topic, please contact our office directly:\n\n📧 **info@college.edu**\n📞 **+91-11-2345-6789**\n\nOr try one of the quick question buttons above! I'm also happy to help with other queries.`;
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+
+  if (!text || isTyping) return;
+
+  input.value = '';
+  autoResize(input);
+
+  addUserMsg(text);
+
+  isTyping = true;
+  document.getElementById('chat-send').disabled = true;
+
+  showTyping();
+
+  setTimeout(() => {
+    fetch("http://localhost:5000/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+  message: text,
+  role: currentUser?.role
+})
+    })
+    .then(res => res.json())
+    .then(data => {
+      hideTyping();
+      addBotMsg(data.reply);
+    })
+    .catch(err => {
+      hideTyping();
+      addBotMsg("⚠ Server error. Try again.");
+      console.error(err);
+    })
+    .finally(() => {
+      isTyping = false;
+      document.getElementById('chat-send').disabled = false;
+    });
+
+  }, 800 + Math.random() * 700);
+}
+function sendChip(text) {
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+function chatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function formatMsg(text) {
+  return escHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════════════
+//  SUGGESTION BOX
+// ═══════════════════════════════════════════════════
+function updateChar(el) {
+  document.getElementById('char-out').textContent = el.value.length;
+}
+
+function setRating(n) {
+  selectedRating = n;
+  document.querySelectorAll('.rating-btn').forEach((b,i) => b.classList.toggle('active', i+1 === n));
+}
+
+async function submitSuggestion() {
+  const cat = v('sug-category');
+  const text = v('sug-text');
+
+  hideMsg('sug-error');
+  hideMsg('sug-success');
+
+  if (!cat) return showMsg('sug-error', '⚠ Select category');
+  if (!text || text.length < 10) return showMsg('sug-error', '⚠ Write at least 10 characters');
+  if (!selectedRating) return showMsg('sug-error', '⚠ Select rating');
+
+  try {
+    const res = await fetch("http://localhost:5000/suggestion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        category: cat,
+        text: text,
+        rating: selectedRating,
+        name: currentUser ? currentUser.fname : "Anonymous"
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      showMsg('sug-success', '✅ Submitted successfully!');
+      showToast('💡 Suggestion sent!');
+
+      // reset form
+      document.getElementById('sug-text').value = '';
+      document.getElementById('sug-category').value = '';
+      document.getElementById('char-out').textContent = '0';
+      setRating(0);
+      selectedRating = 0;
+    } else {
+      showMsg('sug-error', '⚠ Submission failed');
+    }
+
+  } catch (err) {
+    showMsg('sug-error', '⚠ Server not responding');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════
+function v(id) { return document.getElementById(id)?.value?.trim() || ''; }
+
+function showMsg(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function hideMsg(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none';
+}
+
+function togglePwd(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function showToast(msg, icon = '✅') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-icon').textContent = icon;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+updateNav();
+</script>
+</body>
+</html>
